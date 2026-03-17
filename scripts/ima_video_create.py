@@ -63,6 +63,7 @@ DEFAULT_IM_BASE_URL = "https://imapi.liveme.com"
 
 PREFS_PATH = os.path.expanduser("~/.openclaw/memory/ima_prefs.json")
 MAX_POLL_WAIT_SECONDS = 40 * 60
+VIDEO_RECORDS_URL = "https://www.imastudio.com/ai-creation/text-to-video"
 
 # Poll interval (seconds) and max wait (seconds) per task type
 POLL_CONFIG = {
@@ -844,7 +845,7 @@ def create_task(base_url: str, api_key: str,
 def poll_task(base_url: str, api_key: str, task_id: str,
               estimated_max: int = 120,
               poll_interval: int = 5,
-              max_wait: int = 600,
+              max_wait: int = MAX_POLL_WAIT_SECONDS,
               on_progress=None) -> dict:
     """
     POST /open/v1/tasks/detail — poll until completion.
@@ -871,8 +872,8 @@ def poll_task(base_url: str, api_key: str, task_id: str,
         if elapsed > max_wait:
             logger.error(f"Task timeout: task_id={task_id}, elapsed={int(elapsed)}s, max_wait={max_wait}s")
             raise TimeoutError(
-                f"Task {task_id} timed out after {max_wait}s. "
-                "Check the IMA dashboard for status."
+                f"Task {task_id} timed out after {max_wait}s without explicit backend errors. "
+                f"Please check your creation record at {VIDEO_RECORDS_URL}."
             )
 
         resp = requests.post(url, json={"task_id": task_id},
@@ -1211,7 +1212,7 @@ def build_contextual_diagnosis(error_info: dict,
         if normalize_model_id(model_id) == "ima-pro":
             diagnosis["actions"].append("Switch to Ima Sevio 1.0-Fast for quicker turnaround.")
         diagnosis["actions"].append("Retry with shorter duration or lower resolution.")
-        diagnosis["actions"].append("Check task status in dashboard: https://imagent.bot")
+        diagnosis["actions"].append(f"Check your creation record: {VIDEO_RECORDS_URL}")
         return diagnosis
 
     if code == 500 or "internal server error" in msg_lower:
@@ -1450,8 +1451,8 @@ def reflect_on_failure(error_info: dict,
         return {
             "action": "give_up",
             "suggestion": f"Task generation timed out for model '{model_params['model_name']}'. "
-                         f"The task may still be processing in the background. "
-                         f"Check the IMA Studio dashboard (https://imagent.bot) for your task status. "
+                         f"The task may still be processing in the background without explicit backend errors. "
+                         f"Please check your creation record at {VIDEO_RECORDS_URL}. "
                          f"If this model is consistently slow, consider using a faster model."
         }
     
