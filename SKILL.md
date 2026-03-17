@@ -10,6 +10,21 @@ description: >
   Supports text-to-video, image-to-video, first-last-frame, and reference-image workflows.
   Keeps the same API flow, reflection retry mechanism, and interface contract as ima-video-ai.
   Requires IMA API key.
+requires:
+  env:
+    - IMA_API_KEY
+  primaryCredential: IMA_API_KEY
+  credentialNote: >
+    IMA_API_KEY is sent to api.imastudio.com for product/task APIs and to
+    imapi.liveme.com only when local media must be uploaded before task creation.
+persistence:
+  readWrite:
+    - ~/.openclaw/memory/ima_prefs.json
+    - ~/.openclaw/logs/ima_skills/
+  retention: Logs are auto-cleaned after 7 days; preferences remain until user deletes them.
+instructionScope:
+  crossSkillReadOptional:
+    - ~/.openclaw/skills/ima-knowledge-ai/references/*
 ---
 
 # IMA Sevio AI Creation
@@ -96,11 +111,12 @@ Do not expose raw `model_id` unless the user explicitly asks for technical detai
 
 ---
 
-## ⚠️ MANDATORY PRE-CHECK: Read Knowledge Base First!
+## 📚 Optional Knowledge Enhancement (ima-knowledge-ai)
 
-**If ima-knowledge-ai is not installed:** Skip all "Read …" steps below; use only this SKILL's default parsing tables.
+This skill is fully runnable as a standalone package.  
+If `ima-knowledge-ai` is installed, the agent may read its references for better mode selection and consistency guidance.
 
-**BEFORE executing ANY video generation task, you MUST:**
+Recommended optional reads:
 
 1. **Understand video modes** — Read `ima-knowledge-ai/references/video-modes.md`:
 - `image_to_video` = input image becomes frame 1
@@ -247,10 +263,10 @@ Storage: `~/.openclaw/memory/ima_prefs.json`
 ```json
 {
   "user_{user_id}": {
-    "text_to_video": {"model_id": "ima-pro", "model_name": "IMA Pro", "credit": 0, "last_used": "..."},
-    "image_to_video": {"model_id": "ima-pro-fast", "model_name": "IMA Pro Fast", "credit": 0, "last_used": "..."},
-    "first_last_frame_to_video": {"model_id": "ima-pro", "model_name": "IMA Pro", "credit": 0, "last_used": "..."},
-    "reference_image_to_video": {"model_id": "ima-pro", "model_name": "IMA Pro", "credit": 0, "last_used": "..."}
+    "text_to_video": {"model_id": "ima-pro", "model_name": "Ima Sevio 1.0", "credit": 0, "last_used": "..."},
+    "image_to_video": {"model_id": "ima-pro-fast", "model_name": "Ima Sevio 1.0-Fast", "credit": 0, "last_used": "..."},
+    "first_last_frame_to_video": {"model_id": "ima-pro", "model_name": "Ima Sevio 1.0", "credit": 0, "last_used": "..."},
+    "reference_image_to_video": {"model_id": "ima-pro", "model_name": "Ima Sevio 1.0", "credit": 0, "last_used": "..."}
   }
 }
 ```
@@ -404,7 +420,7 @@ Use type=3 leaf nodes to read:
     {
       "attribute_id": 1234,
       "model_id": "ima-pro",
-      "model_name": "IMA Pro",
+      "model_name": "Ima Sevio 1.0",
       "model_version": "ima-pro",
       "app": "ima",
       "platform": "web",

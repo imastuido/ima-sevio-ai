@@ -105,9 +105,9 @@ def to_user_facing_model_name(model_name: str | None, model_id: str | None) -> s
     """Return Sevio-branded model name for user-visible messaging."""
     canonical = normalize_model_id(model_id)
     if canonical == "ima-pro":
-        return "Ima Sevio 1.0 (IMA Video Pro)"
+        return "Ima Sevio 1.0"
     if canonical == "ima-pro-fast":
-        return "Ima Sevio 1.0-Fast (IMA Video Pro Fast)"
+        return "Ima Sevio 1.0-Fast"
     return model_name or "Ima Sevio"
 
 
@@ -1615,7 +1615,10 @@ def save_pref(user_id: str, task_type: str, model_params: dict):
     canonical_model_id = normalize_model_id(model_params.get("model_id")) or model_params.get("model_id")
     prefs.setdefault(key, {})[task_type] = {
         "model_id":    canonical_model_id,
-        "model_name":  model_params["model_name"],
+        "model_name":  to_user_facing_model_name(
+            model_params.get("model_name"),
+            canonical_model_id,
+        ),
         "credit":      model_params["credit"],
         "last_used":   datetime.now(timezone.utc).isoformat(),
     }
@@ -1794,8 +1797,12 @@ def main():
         print(f"❌ {e}", file=sys.stderr)
         sys.exit(1)
 
+    display_model_name = to_user_facing_model_name(
+        mp.get("model_name"),
+        mp.get("model_id"),
+    )
     print(f"✅ Model found:")
-    print(f"   name          = {mp['model_name']}")
+    print(f"   name          = {display_model_name}")
     print(f"   model_id      = {mp['model_id']}")
     print(f"   model_version = {mp['model_version']}   ← version_id from product list")
     print(f"   attribute_id  = {mp['attribute_id']}")
@@ -1912,7 +1919,7 @@ def main():
             "url":        result_url,
             "cover_url":  cover_url,
             "model_id":   mp["model_id"],
-            "model_name": mp["model_name"],
+            "model_name": display_model_name,
             "credit":     mp["credit"],
         }
         print("\n" + json.dumps(out, ensure_ascii=False, indent=2))
