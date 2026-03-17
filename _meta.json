@@ -1,0 +1,8 @@
+{
+  "ownerid": "kn70cjr952qdec1nx70zs6wefn7ynq2t",
+  "slug": "ima-sevio-ai",
+  "name": "IMA Sevio AI Generation",
+  "description": "IMA Sevio 模型技能：提供 Ima Sevio 1.0 与 Ima Sevio 1.0-Fast，支持 text_to_video、image_to_video、first_last_frame_to_video、reference_image_to_video。",
+  "version": "1.1.0",
+  "publishedAt": 1741277713337
+}
